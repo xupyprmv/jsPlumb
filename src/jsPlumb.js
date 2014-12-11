@@ -1031,7 +1031,11 @@
             params.endpointsByElement = endpointsByElement;  
             params.finaliseConnection = _finaliseConnection;
 			var con = new connectionFunc(params);
-			con.id = "con_" + _idstamp();
+			if ('id' in params) {
+				con.id = params.id;
+			} else {
+				con.id = "con_" + _idstamp();
+			}
 
             // if the connection is draggable, then maybe we need to tell the target endpoint to init the
             // dragging code. it won't run again if it already configured to be draggable.

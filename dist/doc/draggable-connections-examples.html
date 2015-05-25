@@ -102,6 +102,18 @@
             <div class="markdown-body">
                 <h3>Draggable Connections Examples</h3>
 
+<h4>A note on <code>dragOptions</code> and <code>dropOptions</code></h4>
+
+<h6>dragOptions</h6>
+
+<p>There are two methods in jsPlumb that allow you to configure an element from which Connections can be dragged - <strong>addEndpoint</strong> and <strong>makeSource</strong>. Each of these methods supports a <code>dragOptions</code> object is one of the parameters in its options.  The allowed values in this object vary depending on the drag library in use: if you are using vanilla jsPlumb then the drag library is <a href="Katavorio">https://github.com/jsplumb/katavorio</a>; otherwise with the jQuery flavour it is jQuery UI.  <code>dragOptions</code> is passed directly through to the underlying library; check the docs for each of these to find out what options are available to you.</p>
+
+<h6>dropOptions</h6>
+
+<p>There are two methods that allow you to configure an element as a Connection drop target - <strong>addEndpoint</strong> and <strong>makeTarget</strong>. Where the source methods support <code>dragOptions</code>, these methods (and yes, one of these methods is the same as a method you&#39;d use to configure a Connection source), these methods support a <code>dropOptions</code> parameter. Again, check the appropriate documentation for details on supported values in this object.</p>
+
+<h4>Examples</h4>
+
 <p>This is a list of examples of how to use jsPlumb to create Connections using drag and drop.  The basic procedure is:</p>
 
 <ol>
@@ -112,66 +124,74 @@
 <p>There are plenty of options you can set when doing this...it will be easier to show you some examples:          </p>
 
 <ul>
-<li><p>Define an Endpoint with default appearance, that is both a source and target of new Connections:
-<pre>
-  var endpointOptions = { isSource:true, isTarget:true }; 
-</pre></p></li>
-<li><p>Register that Endpoint on window3, specifying that it should be located in the top center of the element:
-<pre>
-var window3Endpoint = jsPlumb.addEndpoint(&#39;window3&#39;, { anchor:&quot;TopCenter&quot; }, endpointOptions );<br>
-</pre>
-Notice here the usage of the three-argument addEndpoint  - we can reuse <code>endpointOptions</code> with a different Anchor for another element.  This is a useful practice to get into.</p></li>
-<li><p>Register that Endpoint on window4, specifying that it should be located in the bottom center of the element:
-<pre>
-var window4Endpoint = jsPlumb.addEndpoint(&#39;window4&#39;, {
-anchor:&quot;BottomCenter&quot; }, endpointOptions );<br>
-</pre>
-Now we have two Endpoints, both of which support drag and drop of new Connections.  We can use these to make a programmatic Connection, too, though:</p></li>
-<li><p>Connect window3 to window4 with a 25px wide yellow Bezier that has a &#39;curviness&#39; of 175:
-<pre>
-jsPlumb.connect({ 
-  source:window3Endpoint,
-  target:window4Endpoint,
-  connector: [ &quot;Bezier&quot;, { curviness:175 } ],
-  paintStyle:{ lineWidth:25, strokeStyle:&#39;yellow&#39; }
-});<br>
-</pre>  </p></li>
-<li><p>Define an Endpoint that creates Connections that are 20px wide straight lines, that is both a source and target of new Connections, and that has a <code>scope</code> of <code>blueline</code>. Also, this Endpoint mandates that once it is full, Connections can no longer be dragged from it (even if <code>reattach</code> is specified on a Connection):
-<pre>
-var endpointOptions = { 
-  isSource:true, 
-  isTarget:true,
-  connector : &quot;Straight&quot;,
-  connectorStyle: { lineWidth:20, strokeStyle:&#39;blue&#39; },
-  scope:&quot;blueline&quot;,
-  dragAllowedWhenFull:false<br>
-}; 
-</pre>  </p></li>
-<li><p>Define an Endpoint that will be anchored to <code>TopCenter</code>.  It creates Connections that are 20px wide straight lines, that are both a source and target of new Connections, and that have a <code>scope</code> of <code>blueline</code>. Also, this Endpoint mandates that once it is full, Connections can no longer be dragged from it (even if <code>reattach</code> is specified on a Connection):
-<pre>
-var endpointOptions = {
-  anchor:&quot;Top&quot;, 
-  isSource:true, 
-  isTarget:true,
-  connector : &quot;Straight&quot;,
-  connectorStyle: { lineWidth:20, strokeStyle:&#39;blue&#39; },
-  scope:&quot;blueline&quot;,
-  dragAllowedWhenFull:false<br>
-}; 
-</pre></p></li>
-<li><p>Define an Endpoint that will create a dynamic anchor which can be positioned at <code>TopCenter</code> or <code>BottomCenter</code>.  It creates Connections that are 20px wide straight lines, it is both a source and target of new Connections, and it has a &#39;scope&#39; of &#39;blueline&#39;. Also, this Endpoint mandates that once it is full, Connections can no longer be dragged from it (even if <code>reattach</code> is specified on a Connection):
-<pre>
-var endpointOptions = {
-anchor:[ &quot;TopCenter&quot;, &quot;BottomCenter&quot; ], 
-  isSource:true, 
-  isTarget:true,
-  connector : &quot;Straight&quot;,
-  connectorStyle: { lineWidth:20, strokeStyle:&#39;blue&#39; },
-  scope:&quot;blueline&quot;,
-  dragAllowedWhenFull:false<br>
-}; 
-</pre>  </p></li>
-<li><p>Exactly the same as before, but shows how you can use <code>anchors</code> instead of <code>anchor</code>, if that makes you feel happier:</p></li>
+<li>Define an Endpoint with default appearance, that is both a source and target of new Connections:</li>
+</ul>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">endpointOptions</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">isSource</span><span class="o">:</span><span class="kc">true</span><span class="p">,</span> <span class="nx">isTarget</span><span class="o">:</span><span class="kc">true</span> <span class="p">};</span> 
+</code></pre></div>
+<ul>
+<li>Register that Endpoint on <code>window3</code>, specifying that it should be located in the top center of the element:</li>
+</ul>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">window3Endpoint</span> <span class="o">=</span> <span class="nx">jsPlumb</span><span class="p">.</span><span class="nx">addEndpoint</span><span class="p">(</span><span class="s1">&#39;window3&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">anchor</span><span class="o">:</span><span class="s2">&quot;Top&quot;</span> <span class="p">},</span> <span class="nx">endpointOptions</span> <span class="p">);</span>  
+</code></pre></div>
+<p>Notice here the usage of the three-argument <code>addEndpoint</code>  - we can reuse <code>endpointOptions</code> with a different Anchor for another element.  This is a useful practice to get into. </p>
+
+<ul>
+<li>Register that Endpoint on window4, specifying that it should be located in the bottom center of the element:</li>
+</ul>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">window4Endpoint</span> <span class="o">=</span> <span class="nx">jsPlumb</span><span class="p">.</span><span class="nx">addEndpoint</span><span class="p">(</span><span class="s1">&#39;window4&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">anchor</span><span class="o">:</span><span class="s2">&quot;BottomCenter&quot;</span> <span class="p">},</span> <span class="nx">endpointOptions</span> <span class="p">);</span>  
+</code></pre></div>
+<p>Now we have two Endpoints, both of which support drag and drop of new Connections.  We can use these to make a programmatic Connection, too, though:</p>
+
+<ul>
+<li>Connect window3 to window4 with a 25px wide yellow Bezier that has a &#39;curviness&#39; of 175:</li>
+</ul>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">jsPlumb</span><span class="p">.</span><span class="nx">connect</span><span class="p">({</span> 
+  <span class="nx">source</span><span class="o">:</span><span class="nx">window3Endpoint</span><span class="p">,</span>
+  <span class="nx">target</span><span class="o">:</span><span class="nx">window4Endpoint</span><span class="p">,</span>
+  <span class="nx">connector</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Bezier&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">curviness</span><span class="o">:</span><span class="mi">175</span> <span class="p">}</span> <span class="p">],</span>
+  <span class="nx">paintStyle</span><span class="o">:</span><span class="p">{</span> <span class="nx">lineWidth</span><span class="o">:</span><span class="mi">25</span><span class="p">,</span> <span class="nx">strokeStyle</span><span class="o">:</span><span class="s1">&#39;yellow&#39;</span> <span class="p">}</span>
+<span class="p">});</span>  
+</code></pre></div>
+<ul>
+<li>Define an Endpoint that creates Connections that are 20px wide straight lines, that is both a source and target of new Connections, and that has a <code>scope</code> of <code>blueline</code>. Also, this Endpoint mandates that once it is full, Connections can no longer be dragged from it (even if <code>reattach</code> is specified on a Connection):</li>
+</ul>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">endpointOptions</span> <span class="o">=</span> <span class="p">{</span> 
+      <span class="nx">isSource</span><span class="o">:</span><span class="kc">true</span><span class="p">,</span> 
+      <span class="nx">isTarget</span><span class="o">:</span><span class="kc">true</span><span class="p">,</span>
+      <span class="nx">connector</span> <span class="o">:</span> <span class="s2">&quot;Straight&quot;</span><span class="p">,</span>
+      <span class="nx">connectorStyle</span><span class="o">:</span> <span class="p">{</span> <span class="nx">lineWidth</span><span class="o">:</span><span class="mi">20</span><span class="p">,</span> <span class="nx">strokeStyle</span><span class="o">:</span><span class="s1">&#39;blue&#39;</span> <span class="p">},</span>
+      <span class="nx">scope</span><span class="o">:</span><span class="s2">&quot;blueline&quot;</span><span class="p">,</span>
+      <span class="nx">dragAllowedWhenFull</span><span class="o">:</span><span class="kc">false</span>  
+<span class="p">};</span> 
+</code></pre></div>
+<ul>
+<li>Define an Endpoint that will be anchored to <code>TopCenter</code>.  It creates Connections that are 20px wide straight lines, that are both a source and target of new Connections, and that have a <code>scope</code> of <code>blueline</code>. Also, this Endpoint mandates that once it is full, Connections can no longer be dragged from it (even if <code>reattach</code> is specified on a Connection):</li>
+</ul>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">endpointOptions</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="nx">anchor</span><span class="o">:</span><span class="s2">&quot;Top&quot;</span><span class="p">,</span> 
+      <span class="nx">isSource</span><span class="o">:</span><span class="kc">true</span><span class="p">,</span> 
+      <span class="nx">isTarget</span><span class="o">:</span><span class="kc">true</span><span class="p">,</span>
+      <span class="nx">connector</span> <span class="o">:</span> <span class="s2">&quot;Straight&quot;</span><span class="p">,</span>
+      <span class="nx">connectorStyle</span><span class="o">:</span> <span class="p">{</span> <span class="nx">lineWidth</span><span class="o">:</span><span class="mi">20</span><span class="p">,</span> <span class="nx">strokeStyle</span><span class="o">:</span><span class="s1">&#39;blue&#39;</span> <span class="p">},</span>
+      <span class="nx">scope</span><span class="o">:</span><span class="s2">&quot;blueline&quot;</span><span class="p">,</span>
+      <span class="nx">dragAllowedWhenFull</span><span class="o">:</span><span class="kc">false</span>  
+<span class="p">};</span> 
+</code></pre></div>
+<ul>
+<li>Define an Endpoint that will create a dynamic anchor which can be positioned at <code>Top</code> or <code>Bottom</code>.  It creates Connections that are 20px wide straight lines, it is both a source and target of new Connections, and it has a &#39;scope&#39; of &#39;blueline&#39;. Also, this Endpoint mandates that once it is full, Connections can no longer be dragged from it (even if <code>reattach</code> is specified on a Connection):</li>
+</ul>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">endpointOptions</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">anchor</span><span class="o">:</span><span class="p">[</span> <span class="s2">&quot;TopCenter&quot;</span><span class="p">,</span> <span class="s2">&quot;BottomCenter&quot;</span> <span class="p">],</span> 
+      <span class="nx">isSource</span><span class="o">:</span><span class="kc">true</span><span class="p">,</span> 
+      <span class="nx">isTarget</span><span class="o">:</span><span class="kc">true</span><span class="p">,</span>
+      <span class="nx">connector</span> <span class="o">:</span> <span class="s2">&quot;Straight&quot;</span><span class="p">,</span>
+      <span class="nx">connectorStyle</span><span class="o">:</span> <span class="p">{</span> <span class="nx">lineWidth</span><span class="o">:</span><span class="mi">20</span><span class="p">,</span> <span class="nx">strokeStyle</span><span class="o">:</span><span class="s1">&#39;blue&#39;</span> <span class="p">},</span>
+      <span class="nx">scope</span><span class="o">:</span><span class="s2">&quot;blueline&quot;</span><span class="p">,</span>
+      <span class="nx">dragAllowedWhenFull</span><span class="o">:</span><span class="kc">false</span>  
+<span class="p">};</span> 
+</code></pre></div>
+<ul>
+<li>Exactly the same as before, but shows how you can use <code>anchors</code> instead of <code>anchor</code>, if that makes you feel happier:</li>
 </ul>
 <div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">endpointOptions</span> <span class="o">=</span> <span class="p">{</span>
   <span class="nx">anchors</span><span class="o">:</span><span class="p">[</span> <span class="s2">&quot;TopCenter&quot;</span><span class="p">,</span> <span class="s2">&quot;BottomCenter&quot;</span> <span class="p">],</span> 
@@ -202,42 +222,44 @@ anchor:[ &quot;TopCenter&quot;, &quot;BottomCenter&quot; ],
 <span class="p">};</span> 
 </code></pre></div>
 <ul>
-<li><p>Same example again, but <code>maxConnections</code> being set to -1 means that the Endpoint has no maximum limit of Connections:
-<pre>
-var endpointOptions = { 
-isSource:true, 
-isTarget:true,
-endpoint: [ &quot;Dot&quot;, {radius:30} ],
-style:{ fillStyle:&#39;blue&#39; },
-maxConnections:-1,
-connector : &quot;Straight&quot;,
-connectorStyle: { lineWidth:20, strokeStyle:&#39;blue&#39; },
-scope:&quot;blueline&quot;,
-dropOptions:{ 
-  onDrop:function(e, ui) { 
-      alert(&#39;drop!&#39;); 
-    } 
-  }<br>
-}; 
-</pre>  </p></li>
-<li><p>Assign a UUID to the Endpoint options created above, and add as Endpoints to &quot;window1&quot; and &quot;window2&quot;:
-<pre>
-jsPlumb.addEndpoint(&quot;window1&quot;, { uuid:&quot;abcdefg&quot; }, endpointOptions );
-jsPlumb.addEndpoint(&quot;window2&quot;, { uuid:&quot;hijklmn&quot; }, endpointOptions );
-</pre></p></li>
-<li><p>Connect the two Endpoints we just registered on &quot;window1&quot; and &quot;window2&quot;:
-<pre>
-jsPlumb.connect({uuids:[&quot;abcdefg&quot;, &quot;hijklmn&quot;]});
-</pre></p></li>
-<li><p>Create a source Endpoint, register it on some element, then make some other element a Connection target:
-<pre>
-var sourceEndpoint = { isSource:true, endpoint:[ &quot;Dot&quot;, { radius:50 } ] };
-var targetEndpoint = { endpoint:[ &quot;Rectangle&quot;, { width:10, height:10 } ] };
-jsPlumb.addEndpoint( &quot;window1&quot;, sourceEndpoint );
-jsPlumb.makeTarget( &quot;window2&quot;, targetEndpoint );
-</pre>
-Notice that the endpoint definition we use on the target window does not include the <code>isTarget:true</code> directive.  jsPlumb ignores that flag when creating a Connection using an element as the target; but if you then tried to drag another connection to the Endpoint that was created, you would not be able to.  To permit that, you would set <code>isTarget:true</code> on the targetEndpoint options defined above.</p></li>
+<li>Same example again, but <code>maxConnections</code> being set to -1 means that the Endpoint has no maximum limit of Connections:</li>
 </ul>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">endpointOptions</span> <span class="o">=</span> <span class="p">{</span> 
+    <span class="nx">isSource</span><span class="o">:</span><span class="kc">true</span><span class="p">,</span> 
+    <span class="nx">isTarget</span><span class="o">:</span><span class="kc">true</span><span class="p">,</span>
+    <span class="nx">endpoint</span><span class="o">:</span> <span class="p">[</span> <span class="s2">&quot;Dot&quot;</span><span class="p">,</span> <span class="p">{</span><span class="nx">radius</span><span class="o">:</span><span class="mi">30</span><span class="p">}</span> <span class="p">],</span>
+    <span class="nx">style</span><span class="o">:</span><span class="p">{</span> <span class="nx">fillStyle</span><span class="o">:</span><span class="s1">&#39;blue&#39;</span> <span class="p">},</span>
+    <span class="nx">maxConnections</span><span class="o">:-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="nx">connector</span> <span class="o">:</span> <span class="s2">&quot;Straight&quot;</span><span class="p">,</span>
+    <span class="nx">connectorStyle</span><span class="o">:</span> <span class="p">{</span> <span class="nx">lineWidth</span><span class="o">:</span><span class="mi">20</span><span class="p">,</span> <span class="nx">strokeStyle</span><span class="o">:</span><span class="s1">&#39;blue&#39;</span> <span class="p">},</span>
+    <span class="nx">scope</span><span class="o">:</span><span class="s2">&quot;blueline&quot;</span><span class="p">,</span>
+    <span class="nx">dropOptions</span><span class="o">:</span><span class="p">{</span> 
+          <span class="nx">drop</span><span class="o">:</span><span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">,</span> <span class="nx">ui</span><span class="p">)</span> <span class="p">{</span> 
+            <span class="nx">alert</span><span class="p">(</span><span class="s1">&#39;drop!&#39;</span><span class="p">);</span> 
+          <span class="p">}</span> 
+      <span class="p">}</span>  
+<span class="p">};</span> 
+</code></pre></div>
+<ul>
+<li>Assign a UUID to the Endpoint options created above, and add as Endpoints to &quot;window1&quot; and &quot;window2&quot;:</li>
+</ul>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">jsPlumb</span><span class="p">.</span><span class="nx">addEndpoint</span><span class="p">(</span><span class="s2">&quot;window1&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">uuid</span><span class="o">:</span><span class="s2">&quot;abcdefg&quot;</span> <span class="p">},</span> <span class="nx">endpointOptions</span> <span class="p">);</span>
+<span class="nx">jsPlumb</span><span class="p">.</span><span class="nx">addEndpoint</span><span class="p">(</span><span class="s2">&quot;window2&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">uuid</span><span class="o">:</span><span class="s2">&quot;hijklmn&quot;</span> <span class="p">},</span> <span class="nx">endpointOptions</span> <span class="p">);</span>
+</code></pre></div>
+<ul>
+<li>Connect the two Endpoints we just registered on &quot;window1&quot; and &quot;window2&quot;:</li>
+</ul>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="nx">jsPlumb</span><span class="p">.</span><span class="nx">connect</span><span class="p">({</span><span class="nx">uuids</span><span class="o">:</span><span class="p">[</span><span class="s2">&quot;abcdefg&quot;</span><span class="p">,</span> <span class="s2">&quot;hijklmn&quot;</span><span class="p">]});</span>
+</code></pre></div>
+<ul>
+<li>Create a source Endpoint, register it on some element, then make some other element a Connection target:</li>
+</ul>
+<div class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="kd">var</span> <span class="nx">sourceEndpoint</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">isSource</span><span class="o">:</span><span class="kc">true</span><span class="p">,</span> <span class="nx">endpoint</span><span class="o">:</span><span class="p">[</span> <span class="s2">&quot;Dot&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">radius</span><span class="o">:</span><span class="mi">50</span> <span class="p">}</span> <span class="p">]</span> <span class="p">};</span>
+<span class="kd">var</span> <span class="nx">targetEndpoint</span> <span class="o">=</span> <span class="p">{</span> <span class="nx">endpoint</span><span class="o">:</span><span class="p">[</span> <span class="s2">&quot;Rectangle&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">width</span><span class="o">:</span><span class="mi">10</span><span class="p">,</span> <span class="nx">height</span><span class="o">:</span><span class="mi">10</span> <span class="p">}</span> <span class="p">]</span> <span class="p">};</span>
+<span class="nx">jsPlumb</span><span class="p">.</span><span class="nx">addEndpoint</span><span class="p">(</span> <span class="s2">&quot;window1&quot;</span><span class="p">,</span> <span class="nx">sourceEndpoint</span> <span class="p">);</span>
+<span class="nx">jsPlumb</span><span class="p">.</span><span class="nx">makeTarget</span><span class="p">(</span> <span class="s2">&quot;window2&quot;</span><span class="p">,</span> <span class="nx">targetEndpoint</span> <span class="p">);</span>
+</code></pre></div>
+<p>Notice that the endpoint definition we use on the target window does not include the <code>isTarget:true</code> directive.  jsPlumb ignores that flag when creating a Connection using an element as the target; but if you then tried to drag another connection to the Endpoint that was created, you would not be able to.  To permit that, you would set <code>isTarget:true</code> on the targetEndpoint options defined above.</p>
 
             </div>
         </div>

@@ -8,9 +8,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width">
+    {% include meta.html %}
     <title>{{ page.title }}</title>
 
     {% include css.html %}
@@ -19,9 +17,12 @@
     <!-- yuidoc -->
     <link rel="stylesheet" href="{{ page.yuiGridsUrl }}">
     <link rel="stylesheet" href="{{ page.projectAssets }}/vendor/prettify/prettify-min.css">
-    <link rel="stylesheet" href="{{ page.projectAssets }}/css/main.css" id="site_styles">
+
+    <link rel="stylesheet" href="{{page.base}}/css/external/cssgrids-min.css">
+    <link rel="stylesheet" href="{{page.base}}/css/external/prettify-min.css">
+
     <link rel="shortcut icon" type="image/png" href="{{page.base}}/img/favicon.png">
-    <script src="{{ page.yuiSeedUrl }}"></script>
+    <script src="https://yui-s.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
     <style>
         #doc {
             text-align:left;
@@ -32,10 +33,14 @@
 <body class="yui3-skin-sam">
 
     {% include header.html %}
+
+    <div class="container">
+        <div class="row">
+            {{ content }}
+        </div>
+    </div>
     
-    {{ content }}
-    
-    {% include track-apidocs.html %}
+    {% include track.html %}
     
 <script src="{{ page.projectAssets }}/vendor/prettify/prettify-min.js"></script>
 <script>prettyPrint();</script>

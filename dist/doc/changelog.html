@@ -2,39 +2,62 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <meta name="viewport" content="width=device-width">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
         <link rel="shortcut icon" type="image/png" href="../img/favicon.png">
         <title></title>
 
         
 
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
-<link rel="stylesheet" href="../css/jsplumb.css">
+<link href="//fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">
+<link rel="stylesheet" href="../css/main.css">
         <link rel="stylesheet" href="../css/jsplumb-doc.css">
+
     </head>
     <body>
-        <div id="headerWrapper">
-    <div id="header">
-        <div class="logo"><img src="http://jsplumbtoolkit.com/logo-bw.png"></div>
-        <div class="menu">   
-            <a href="../demo">DEMOS</a>
-            <a href="../doc/home.html">DOCS</a>                    
-            <a href="../apidocs">API</a>
-            <a href="../tests/index.html">TESTS</a>
-            <a href="mailto:hello@jsplumbtoolkit.com">CONTACT</a>
-            <a href="http://blog.jsplumbtoolkit.com">BLOG</a>
-            <a href="http://github.com/sporritt/jsplumb/">GITHUB</a>
-            <a href="https://groups.google.com/forum/?fromgroups#!forum/jsplumb">DISCUSS</a>
-            <a href="https://github.com/sporritt/jsPlumb/issues">ISSUES</a>
-        </div>
-    </div>
-</div> 
+        <div class="navbar navbar-top navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
 
-        <div class="main">
-            <div class="nav">
-                <h3>Contents</h3>
-<ul>
+            <a class="navbar-brand" href="/"><img src="../../img/logo-medium-jsplumb.png"></a>
+            <div class="community"></div>
+
+        </div>
+
+        <div class="navbar-collapse collapse nav-wrapper">
+            <ul class="nav navbar-nav">
+                <li><a href="../">DEMOS</a></li>
+                <li><a href="../doc/home.html">DOCS</a></li>
+                <li><a href="../apidocs/index.html">API</a></li>
+                <li><a href="../download">DOWNLOAD</a></li>
+                <li><a href="http://beta.jsplumbtoolkit.com/contact.html">CONTACT</a></li>
+                <li><a href="https://blog.jsplumbtoolkit.com">BLOG</a></li>
+
+            </ul>
+
+            <div class="social-nav hidden-xs">
+                <a href="http://twitter.com/jsplumblib" class="link"><span class="icon-twitter"></span></a>
+                <a href="http://github.com/sporritt/jsplumb/" class="link"><span class="icon-github"></span></a>
+                <a href="http://www.linkedin.com/company/jsplumb" class="link"><span class="icon-linkedin"></span></a>
+
+            </div>
+        </div><!--/.nav-collapse -->
+    </div>
+</div>
+
+        <div class="container padding-top">
+            <div class="row" id="docs">
+                <div class="docs-nav col-xs-3" tabindex="0">
+                    <ul>
 <li><a href="changelog.html">Changelog</a></li>
 <li>Required imports and basic setup<ul>
 <li><a href="home.html#browser">Browser Compatibility</a></li>
@@ -98,18 +121,73 @@
 </ul>
 </li>
 </ul>
-            </div>
-            <div class="markdown-body">
-                <h2>1.7.6</h2>
+                </div>
+                <div class="markdown-body col-xs-9">
+                    <h2>1.7.10</h2>
+
+<h3>Changes between 1.7.9 and 1.7.10</h3>
+
+<ul>
+<li>Small update to getOffset to make it return the correct value if the input element was the container itself.</li>
+<li>Small update to animation to fix incorrect falsey check.</li>
+<li>Documented the <code>on</code> method of a <code>jsPlumbInstance</code> in the API docs.</li>
+<li><code>on</code> and <code>off</code> event registration methods now return the current jsPlumb instance</li>
+</ul>
+
+<h2>1.7.9</h2>
+
+<h3>Changes between 1.7.8 and 1.7.9</h3>
+
+<ul>
+<li>No more jQuery flavour. Vanilla jsPlumb is the only jsPlumb, and as such, has been renamed to simply <code>jsPlumb-1.7.9.js</code>.</li>
+<li>First version of jsPlumb to be published to npm.</li>
+<li>Addition of getManagedElements method. Returns a map of all the elements the instance of jsPlumb is currently managing.</li>
+</ul>
+
+<h4>Issues</h4>
+
+<ul>
+<li><strong>421</strong> svg gradient elements not cleaned up properly</li>
+</ul>
+
+<h2>1.7.8</h2>
+
+<h3>Changes between 1.7.7 and 1.7.8</h3>
+
+<h4>Issues</h4>
+
+<ul>
+<li><strong>381</strong> -  instance.detach(connection) will detach source endpoint as well</li>
+<li><strong>419</strong> -  endpoints not cleaned up properly when connection converted to looback to endpoints not cleaned up properly when connection converted to loopback</li>
+<li><strong>420</strong> - Image endpoint not cleaned up correctly</li>
+</ul>
+
+<h2>1.7.7</h2>
+
+<h3>Changes between 1.7.6 and 1.7.7</h3>
+
+<h4>Issues</h4>
+
+<ul>
+<li><strong>408</strong> - setIdChanged doesn&#39;t correctly handle element sources/targets</li>
+<li><strong>410</strong> - setConnector (whether applied via type or directly) removes custom css classes of other types</li>
+<li><strong>412</strong> - Endpoint style cannot be transparent </li>
+<li><strong>415</strong> - Unnecessary endpoint may be created at when drag and drop endpoint from one node to another.</li>
+</ul>
+
+<h2>1.7.6</h2>
 
 <h3>Changes between 1.7.5 and 1.7.6</h3>
 
-<p>A minor bugfix release, with a few new options for controlling connection detachment (and one small backward compatibility issue to be aware of)</p>
+<p>A minor bugfix release, with a few new options for controlling connection detachment (and one small backwards 
+compatibility issue to be aware of)</p>
 
 <h4>Backwards Compatibility</h4>
 
 <ul>
-<li>All versions of jsPlumb prior to 1.7.6 would fire <code>beforeDetach</code> for both new Connection drags and also dragging of existing Connections. As of 1.7.6 this latter behaviour has been moved to the <code>beforeStartDetach</code> interceptor.</li>
+<li>All versions of jsPlumb prior to 1.7.6 would fire <code>beforeDetach</code> for both new Connection drags and also 
+dragging of existing Connections. As of 1.7.6 this latter behaviour has been moved to the <code>beforeStartDetach</code> 
+interceptor.</li>
 </ul>
 
 <h4>New Functionality</h4>
@@ -117,8 +195,12 @@
 <ul>
 <li><p><code>revalidate</code> now supports the same arguments as repaint - an ID, an Element, or a list-like
 object (such as the results of $(..) or document.querySelectorAll)</p></li>
-<li><p>added <code>beforeStartDetach</code> interceptor: a function that is called before an existing connection is dragged off of one of its endpoints, and which can return false to cancel the drag.</p></li>
-<li><p>The <code>unbind</code> method on various objects (jsPlumbInstance, Connection, Endpoint to name a few) now supports passing a Function to be unbound, rather than just some event name.</p></li>
+<li><p>added <code>beforeStartDetach</code> interceptor: a function that is called before an existing connection is dragged off of 
+one of its endpoints, and which can return false to cancel the drag.</p></li>
+<li><p>The <code>unbind</code> method on various objects (jsPlumbInstance, Connection, Endpoint to name a few) now supports passing a 
+Function to be unbound, rather than just some event name.</p></li>
+<li><p>Connectors now have a <code>getLength</code> function, which returns their length in pixels. To access from a Connection,
+  you need to first get the connector: <code>someConnection.getConnector().getLength()</code></p></li>
 </ul>
 
 <h4>Issues</h4>
@@ -128,6 +210,10 @@ object (such as the results of $(..) or document.querySelectorAll)</p></li>
 <li><strong>353</strong> - multiple select disabled</li>
 <li><strong>367</strong> - rendering and drag/drop errors when parent element scrolled</li>
 <li><strong>369</strong> - unbinding events</li>
+<li><strong>383</strong> - jsPlumb.setDraggable fails for getElementsByClassName return value</li>
+<li><strong>392</strong> - onMaxConnections jpc isn&#39;t defined</li>
+<li><strong>402</strong> - offset update cache</li>
+<li><strong>404</strong> - statemachine demo makes ghost endpoints</li>
 </ul>
 
 <h2>1.7.5</h2>
@@ -547,7 +633,8 @@ object (such as the results of $(..) or document.querySelectorAll)</p></li>
 
 <p>Release 1.5.0 contains several bugfixes and one or two minor enhancements, but the biggest change since 1.4.1 is the way jsPlumb handles inheritance internally - it has switched from a &#39;module pattern&#39; architecture to a prototypal-based setup.  The module pattern is good for information hiding, but it makes objects bigger, and its far easier to leak memory with that sort of arrangement than it is with a prototypal inheritance scheme. </p>
 
-<p>The build has been switched from the original Ant build to Grunt with release 1.5.0, and with this has come the ability to build versions of jsPlumb that omit functionality you do not need (see [[here|Build]]).</p>
+<p>The build has been switched from the original Ant build to Grunt with release 1.5.0, and with this has come the ability to 
+build versions of jsPlumb that omit functionality you do not need (see <a href="Build">here</a>).</p>
 
 <ol>
 <li><a href="#backwards">Backwards Compatibility</a></li>
@@ -616,22 +703,21 @@ object (such as the results of $(..) or document.querySelectorAll)</p></li>
 
 <p>Nothing to report.</p>
 
+                </div>
             </div>
         </div>
-        
-        <script type="text/javascript">
 
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-15400992-4']);
-    _gaq.push(['_trackPageview']);
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
+    ga('create', 'UA-49979015-1', 'auto');
+    ga('send', 'pageview');
 
 </script>
+
 
     </body>
 </html>

@@ -1,3 +1,43 @@
+* 1.7.10
+
+    - Small update to getOffset to make it return the correct value if the input element was the container itself.
+    - Small update to animation to fix incorrect falsey check.
+    - Documented the `on` method of a `jsPlumbInstance` in the API docs.
+    - `on` and `off` event registration methods now return the current jsPlumb instance
+
+* 1.7.9
+
+    No more jQuery flavour. Vanilla jsPlumb is the only jsPlumb, and as such, has been renamed to simply `jsPlumb-1.7.9.js`.
+
+    This is also the first version of jsPlumb to be published to npm.
+
+    NEW FUNCTIONALITY
+
+    - Addition of getManagedElements method. Returns a map of all the elements the instance of jsPlumb is currently managing.
+
+    ISSUES
+
+    - 421 - svg gradient elements not cleaned up properly
+
+* 1.7.8
+
+    ISSUES
+
+    - 381 -  instance.detach(connection) will detach source endpoint as well
+    - 419 -  endpoints not cleaned up properly when connection converted to looback to endpoints not cleaned up properly when connection converted to loopback
+    - 420 - Image endpoint not cleaned up correctly
+
+
+* 1.7.7
+
+    ISSUES
+
+    - 408 - setIdChanged doesn't correctly handle element sources/targets
+    - 410 - setConnector (whether applied via type or directly) removes custom css classes of other types
+    - 412 - Endpoint style cannot be transparent
+    - 415 - Unnecessary endpoint may be created at when drag and drop endpoint from one node to another.
+
+
 * 1.7.6
 
     A minor bugfix release, with a few new options for controlling connection detachment (and one small backward compatibility issue to be aware of).
@@ -22,13 +62,19 @@
     - Connectors now have a `getLength` function, which returns their length in pixels. To access from a Connection,
     you need to first get the connector: `someConnection.getConnector().getLength()`
 
+    - A CSS class (by default _jsPlumb_connector_outline) is now added to the `path` element that acts as a Connector's outline.
+
 
     ISSUES
 
     350 - recalculateOffsets not working
     353 - multiple select disabled
     367 - rendering and drag/drop errors when parent element scrolled
-
+    369 - unbinding events
+    383 - jsPlumb.setDraggable fails for getElementsByClassName return value
+    392 - onMaxConnections jpc isn't defined
+    402 - offset update cache
+    404 - statemachine demo makes ghost endpoints
 
 
 * 1.7.5

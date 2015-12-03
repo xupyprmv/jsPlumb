@@ -80,6 +80,9 @@
 * @param {String[]} [params.uuids] Optional array of UUIDs of the two Endpoints to connect. If you supply this you do not need to supply `source` or `target`.
 * @param {String} [params.type] Optional type for the Connection.
 * @param {String} [params.pointer-events] Optional `pointer-events` value for the Connection (only used by the SVG renderer)
+* @param {String|Array} [params.connector] The type of Connector to use. Defaults to whatever is set in the defaults for the instance. This
+* parameter can be either a String - a named Connector, such as "Straight" - or an array consisting of a Connector name plus
+* constructor parameters. For further information see the main documentation.
 * @param {Object} referenceParams Optional second set of parameters, which will be merged into a new object along with `params`. This can be useful if
 * you have some common settings to share between multiple `connect` calls. Valid values in this object are anything that is valid in `params`.
 * @return {Connection} The Connection that was created, or null if either the source or target element was not found (in which case the missin element is also logged).
@@ -1022,4 +1025,29 @@
   * @type {String}
   * @default "_jsPlumb_Default_Scope"
   */
+
+/**
+ * Register an event handler, optionally as a delegate for some set of descendant elements. Note
+ * that this method takes either 3 or 4 arguments - if you supply 3 arguments it is assumed you have
+ * omitted the `children` parameter, and that the event handler should be bound directly to the given element.
+ * @method on
+ * @param {Element[]|Element|String} el Either an Element, or a CSS selector (if you want to specify an ID you must prepend it with '#'), or an array of Elements.
+ * @param {String} [children] Comma-delimited list of selectors identifying allowed children.
+ * @param {String} event Event ID.
+ * @param {Function} fn Event handler function.
+ * @chainable
+ * @return {jsPlumbInstance} The current jsPlumb instance; you can chain this method.
+ */
+
+/**
+ * Cancel delegate event handling for the given function. Note that unlike with 'on' you do not supply
+ * a list of child selectors here: it removes event delegation from all of the child selectors for which the
+ * given function was registered (if any).
+ * @method off
+ * @param {Element[]|Element|String} el Either an Element, or a CSS selector (if you want to specify an ID you must prepend it with '#'), or an array of Elements, from which to remove the event listener.
+ * @param {String} event Event ID.
+ * @param {Function} fn Event handler function.
+ * @chainable
+ * @return {jsPlumbInstance} The current jsPlumb instance; you can chain this method.
+ */
 

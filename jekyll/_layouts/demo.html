@@ -1,31 +1,27 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-		<meta name="viewport" content="width=device-width">
+        {% include meta.html %}
 		<link rel="shortcut icon" type="image/png" href="{{page.base}}/img/favicon.png">
-        <title>jsPlumb {{ site.jsplumb }} demo - {{ page.demo }} ({{ page.libraryName }})</title>
+        <title>jsPlumb {{ site.jsplumb }} demo - {{ page.demo }}</title>
 		{% include css.html %}
+        {% include demo.css.html %}
 		<link rel="stylesheet" href="demo.css">
     </head>
     
-    <body data-demo-id="{{page.demo}}" data-library="{{page.library}}">
+    <body data-demo-id="{{page.demo}}">
         {% include header.html %}
-        {% include pleasebemyfriend.html %}
 
-        <div id="main">
+        <div class="jtk-demo-main">
             {{content}}
         </div>
 		
-		{% assign libimport='' %}
-		{% capture libimport %}{{page.library}}.jsplumb.html{% endcapture %}
-		{% include {{libimport}} %}
+		{% include dom.jsplumb.html %}
 		
 		<script src="demo.js"></script>
 		<script src="{{page.base}}/js/demo-list.js"></script>
 		
-		{% include track-jsplumb.html %}
+		{% include track.html %}
         
      </body>
 </html>

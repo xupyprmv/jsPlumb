@@ -1,7 +1,7 @@
 /*
  * jsPlumb
  * 
- * Title:jsPlumb 1.7.6
+ * Title:jsPlumb 1.7.10
  * 
  * Provides a way to visually connect elements on an HTML page, using SVG or VML.  
  * 
@@ -61,8 +61,8 @@
         // will have that Connection in it. listeners for the jsPlumbConnection event can look for that
         // member and take action if they need to.
         this.previousConnection = params.previousConnection;
-        this.source = _jp.getDOMElement(params.source);
-        this.target = _jp.getDOMElement(params.target);
+        this.source = _jp.getElement(params.source);
+        this.target = _jp.getElement(params.target);
         // sourceEndpoint and targetEndpoint override source/target, if they are present. but 
         // source is not overridden if the Endpoint has declared it is not the final target of a connection;
         // instead we use the source that the Endpoint declares will be the final source element.
@@ -216,7 +216,10 @@
 // PAINTING
 
         this.setConnector(this.endpoints[0].connector || this.endpoints[1].connector || params.connector || _jsPlumb.Defaults.Connector || _jp.Defaults.Connector, true);
-        this.getData = function() { return params.data; };
+        var data = params.data == null || !jsPlumbUtil.isObject(params.data) ? {} : params.data;
+        this.getData = function() { return data; };
+        this.setData = function(d) { data = d || {}; };
+        this.mergeData = function(d) { data = jsPlumb.extend(data, d); };
 
         // the very last thing we do is apply types, if there are any.
         var _types = [ "default",  params.type, this.endpoints[0].connectionType, this.endpoints[1].connectionType ].join(" ");
@@ -354,11 +357,12 @@
         },
         setPreparedConnector: function(connector, doNotRepaint, doNotChangeListenerComponent, typeId) {
 
-            var previous;
+            var previous, previousClasses = "";
             // the connector will not be cleaned up if it was set as part of a type, because `typeId` will be set on it
             // and we havent passed in `true` for "force" here.
             if (this.connector != null) {
                 previous = this.connector;
+                previousClasses = previous.getClass();
                 this.connector.cleanup();
                 this.connector.destroy();
             }
@@ -370,6 +374,9 @@
 
             this.canvas = this.connector.canvas;
             this.bgCanvas = this.connector.bgCanvas;
+
+            // put classes from prior connector onto the canvas
+            this.addClass(previousClasses);
 
             // new: instead of binding listeners per connector, we now just have one delegate on the container.
             // so for that handler we set the connection as the '_jsPlumb' member of the canvas element, and

@@ -1,7 +1,7 @@
 /*
  * jsPlumb
  *
- * Title:jsPlumb 1.7.6
+ * Title:jsPlumb 1.7.10
  *
  * Provides a way to visually connect elements on an HTML page, using SVG or VML.
  *
@@ -113,7 +113,7 @@
                 if (p) {
                     for (var i = 0; i < p.childNodes.length; i++) {
                         if (p.childNodes[i].nodeType != 3 && p.childNodes[i].nodeType != 8) {
-                            var cEl = jsPlumb.getDOMElement(p.childNodes[i]),
+                            var cEl = jsPlumb.getElement(p.childNodes[i]),
                                 cid = _currentInstance.getId(p.childNodes[i], null, true);
                             if (cid && _elementsWithEndpoints[cid] && _elementsWithEndpoints[cid] > 0) {
                                 var cOff = _currentInstance.getOffset(cEl);
@@ -138,7 +138,7 @@
         // refresh the offsets for child elements of this element.
         this.updateOffsets = function (elId) {
             if (elId != null) {
-                var domEl = jsPlumb.getDOMElement(elId),
+                var domEl = jsPlumb.getElement(elId),
                     id = _currentInstance.getId(domEl),
                     children = _delements[id],
                     parentOffset = _currentInstance.getOffset(domEl);
@@ -146,7 +146,7 @@
                 if (children) {
                     for (var i in children) {
                         if (children.hasOwnProperty(i)) {
-                            var cel = jsPlumb.getDOMElement(i),
+                            var cel = jsPlumb.getElement(i),
                                 cOff = _currentInstance.getOffset(cel);
 
                             _delements[id][i] = {
@@ -268,12 +268,12 @@
         };
 
         this.getDragAncestor = function (el) {
-            var de = jsPlumb.getDOMElement(el),
+            var de = jsPlumb.getElement(el),
                 id = _currentInstance.getId(de),
                 aid = _draggablesForElements[id];
 
             if (aid)
-                return jsPlumb.getDOMElement(aid);
+                return jsPlumb.getElement(aid);
             else
                 return null;
         };
@@ -318,17 +318,6 @@
             _oneSet(false, classesToRemove);
 
             _setClassName(el, curClasses.join(" "));
-        },
-        _each = function (spec, fn) {
-            if (spec == null) return;
-            if (typeof spec === "string")
-                fn(jsPlumb.getDOMElement(spec));
-            else if (spec.length != null) {
-                for (var i = 0; i < spec.length; i++)
-                    fn(jsPlumb.getDOMElement(spec[i]));
-            }
-            else
-                fn(spec); // assume it's an element.
         };
 
     jsPlumb.extend(jsPlumbInstance.prototype, {
@@ -383,7 +372,6 @@
             for (var i in atts)
                 if (atts.hasOwnProperty(i)) el.setAttribute(i, atts[i]);
         },
-
         appendToRoot: function (node) {
             document.body.appendChild(node);
         },
@@ -415,30 +403,31 @@
 
             return renderMode;
         },
+        getClass:_getClassName,
         addClass: function (el, clazz) {
-            _each(el, function (e) {
+            jsPlumb.each(el, function (e) {
                 _classManip(e, clazz);
             });
         },
         hasClass: function (el, clazz) {
-            el = jsPlumb.getDOMElement(el);
+            el = jsPlumb.getElement(el);
             if (el.classList) return el.classList.contains(clazz);
             else {
                 return _getClassName(el).indexOf(clazz) != -1;
             }
         },
         removeClass: function (el, clazz) {
-            _each(el, function (e) {
+            jsPlumb.each(el, function (e) {
                 _classManip(e, null, clazz);
             });
         },
         updateClasses: function (el, toAdd, toRemove) {
-            _each(el, function (e) {
+            jsPlumb.each(el, function (e) {
                 _classManip(e, toAdd, toRemove);
             });
         },
         setClass: function (el, clazz) {
-            _each(el, function (e) {
+            jsPlumb.each(el, function (e) {
                 _setClassName(e, clazz);
             });
         },
@@ -463,7 +452,6 @@
                 return el.currentStyle[prop];
             }
         },
-
         getSelector: function (ctx, spec) {
             var sel = null;
             if (arguments.length == 1) {
@@ -475,27 +463,24 @@
             return sel;
         },
         getOffset:function(el, relativeToRoot) {
-            el = jsPlumb.getDOMElement(el);
+            el = jsPlumb.getElement(el);
             var container = this.getContainer();
             var out = {
                     left: el.offsetLeft,
                     top: el.offsetTop
                 },
-                op = (relativeToRoot  || (container != null && el.offsetParent != container)) ?  el.offsetParent : null,
+                op = (relativeToRoot  || (container != null && (el != container && el.offsetParent != container))) ?  el.offsetParent : null,
                 _maybeAdjustScroll = function(offsetParent) {
                     if (offsetParent != null && offsetParent !== document.body && (offsetParent.scrollTop > 0 || offsetParent.scrollLeft > 0)) {
-                        var p = this.getStyle(el, "position");
-                        if (p !== "fixed") {
-                            out.left -= offsetParent.scrollLeft;
-                            out.top -= offsetParent.scrollTop;
-                        }
+                        out.left -= offsetParent.scrollLeft;
+                        out.top -= offsetParent.scrollTop;
                     }
                 }.bind(this);
 
             while (op != null) {
                 out.left += op.offsetLeft;
                 out.top += op.offsetTop;
-                if (!relativeToRoot) _maybeAdjustScroll(op);
+                _maybeAdjustScroll(op);
                 op = relativeToRoot ? op.offsetParent :
                         op.offsetParent == container ? null : op.offsetParent;
             }

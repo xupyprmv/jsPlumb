@@ -2,39 +2,62 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <meta name="viewport" content="width=device-width">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
         <link rel="shortcut icon" type="image/png" href="../img/favicon.png">
         <title></title>
 
         
 
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
 <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
-<link rel="stylesheet" href="../css/jsplumb.css">
+<link href="//fonts.googleapis.com/css?family=Lato:400,700" rel="stylesheet">
+<link rel="stylesheet" href="../css/main.css">
         <link rel="stylesheet" href="../css/jsplumb-doc.css">
+
     </head>
     <body>
-        <div id="headerWrapper">
-    <div id="header">
-        <div class="logo"><img src="http://jsplumbtoolkit.com/logo-bw.png"></div>
-        <div class="menu">   
-            <a href="../demo">DEMOS</a>
-            <a href="../doc/home.html">DOCS</a>                    
-            <a href="../apidocs">API</a>
-            <a href="../tests/index.html">TESTS</a>
-            <a href="mailto:hello@jsplumbtoolkit.com">CONTACT</a>
-            <a href="http://blog.jsplumbtoolkit.com">BLOG</a>
-            <a href="http://github.com/sporritt/jsplumb/">GITHUB</a>
-            <a href="https://groups.google.com/forum/?fromgroups#!forum/jsplumb">DISCUSS</a>
-            <a href="https://github.com/sporritt/jsPlumb/issues">ISSUES</a>
-        </div>
-    </div>
-</div> 
+        <div class="navbar navbar-top navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
 
-        <div class="main">
-            <div class="nav">
-                <h3>Contents</h3>
-<ul>
+            <a class="navbar-brand" href="/"><img src="../../img/logo-medium-jsplumb.png"></a>
+            <div class="community"></div>
+
+        </div>
+
+        <div class="navbar-collapse collapse nav-wrapper">
+            <ul class="nav navbar-nav">
+                <li><a href="../">DEMOS</a></li>
+                <li><a href="../doc/home.html">DOCS</a></li>
+                <li><a href="../apidocs/index.html">API</a></li>
+                <li><a href="../download">DOWNLOAD</a></li>
+                <li><a href="http://beta.jsplumbtoolkit.com/contact.html">CONTACT</a></li>
+                <li><a href="https://blog.jsplumbtoolkit.com">BLOG</a></li>
+
+            </ul>
+
+            <div class="social-nav hidden-xs">
+                <a href="http://twitter.com/jsplumblib" class="link"><span class="icon-twitter"></span></a>
+                <a href="http://github.com/sporritt/jsplumb/" class="link"><span class="icon-github"></span></a>
+                <a href="http://www.linkedin.com/company/jsplumb" class="link"><span class="icon-linkedin"></span></a>
+
+            </div>
+        </div><!--/.nav-collapse -->
+    </div>
+</div>
+
+        <div class="container padding-top">
+            <div class="row" id="docs">
+                <div class="docs-nav col-xs-3" tabindex="0">
+                    <ul>
 <li><a href="changelog.html">Changelog</a></li>
 <li>Required imports and basic setup<ul>
 <li><a href="home.html#browser">Browser Compatibility</a></li>
@@ -98,15 +121,18 @@
 </ul>
 </li>
 </ul>
-            </div>
-            <div class="markdown-body">
-                <h2>jsPlumb</h2>
+                </div>
+                <div class="markdown-body col-xs-9">
+                    <h2>jsPlumb</h2>
 
-<p>jsPlumb provides a means for a developer to visually connect elements on their web pages. It uses SVG in modern browsers, and VML on IE 8 and below. </p>
+<p>jsPlumb Community edition provides a means for a developer to visually connect elements on their web pages. It uses 
+SVG in modern browsers, and VML on IE 8 and below. </p>
 
-<p>The latest version is 1.7.6. From 1.7.0, jsPlumb has no longer supported YUI or Mootools - if you want to use some external library to manage dragging, then jQuery is your only option.  But it is recommended that you use vanilla jsPlumb wherever possible: it&#39;s faster than the jQuery version, it offers more features (multiple element dragging, multiple scopes), and since the <a href="https://github.com/jsplumb/mottle">event handling</a> and <a href="https://github.com/jsplumb/katavorio">drag/drop</a> code are also projects managed by jsPlumb, you&#39;re more likely to get a feature request for requirements related to those sorts of things to happen. Plus, it is highly likely that support for the jQuery flavour will be dropped at some point. There is no date yet planned for this, but it seems likely.</p>
+<p>jsPlumb has no external dependencies.</p>
 
-<p>This will be the final version (apart from other bugfix releases in 1.7.x) to support IE8. The next major release will be 2.0.0, and this will work only in modern browsers that support SVG. </p>
+<p>The 1.7.x line of releases will be the last ones to support IE8. We are trickling the occasional bugfix and feature into
+1.7.x but the next major event in the Community edition will be release 2.0.0, which will work only in modern browsers
+that support SVG. </p>
 
 <h2>Imports and Setup</h2>
 
@@ -166,29 +192,9 @@
 
 <h3>Required Imports</h3>
 
-<h5>Vanilla</h5>
-
 <p>No required imports. </p>
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;PATH_TO/dom.jsPlumb-1.7.6-min.js &quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
+<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;PATH_TO/dom.jsPlumb-x.x.x-min.js &quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
 </code></pre></div>
-<h6>Touch events</h6>
-
-<p>Touch events are supported out of the box.</p>
-
-<h5>jQuery</h5>
-
-<ul>
-<li>jQuery 1.3.x or higher. jsPlumb has been tested with everything up to 2.x. Remember that jQuery 2.x does not support IE&lt;9.</li>
-<li>jQuery UI 1.7.x or higher (if you wish to support drag and drop). Always remember to check that the versions of jQuery and jQuery UI you are using are compatible.</li>
-</ul>
-<div class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;//ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js&quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">&quot;PATH_TO/jquery.jsPlumb-1.7.6-min.js &quot;</span><span class="nt">&gt;&lt;/script&gt;</span>
-</code></pre></div>
-<h6>Touch Events</h6>
-
-<p>There is a neat plugin you can use for this - <a href="http://touchpunch.furf.com/">jQuery UI Touch Punch</a>.  You need to include it in your page after both jQuery and jQueryUI. It does not, however, work with the <code>makeSource</code> functionality in jsPlumb. Better to use vanilla jsPlumb!</p>
-
 <p><a name="initializing"></a></p>
 
 <h3>Initializing jsPlumb</h3>
@@ -438,22 +444,21 @@
 
 <p>Static anchors like <code>Top</code>, <code>Bottom</code> etc are the fastest.</p>
 
+                </div>
             </div>
         </div>
-        
-        <script type="text/javascript">
 
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-15400992-4']);
-    _gaq.push(['_trackPageview']);
+        <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+            m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-    (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
+    ga('create', 'UA-49979015-1', 'auto');
+    ga('send', 'pageview');
 
 </script>
+
 
     </body>
 </html>

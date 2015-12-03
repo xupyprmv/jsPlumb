@@ -1,7 +1,7 @@
 /*
  * jsPlumb
  * 
- * Title:jsPlumb 1.7.6
+ * Title:jsPlumb 1.7.10
  * 
  * Provides a way to visually connect elements on an HTML page, using SVG or VML.  
  * 
@@ -36,7 +36,7 @@
          * a selector (in which case we return el[0]), or a DOM element already (we assume this if it's not either of the other
          * two cases).  this is the opposite of getElementObject below.
          */
-        getDOMElement: function (el) {
+        getElement: function (el) {
             if (el == null) return null;
             if (typeof(el) == "string") return document.getElementById(el);
             else if (el.context || el.length != null) return el[0];
@@ -131,8 +131,8 @@
          * takes the args passed to an event function and returns you an object representing that which is being dragged.
          */
         getDragObject: function (eventArgs) {
-            //return eventArgs[1].draggable || eventArgs[1].helper;
-            return eventArgs[1].helper || eventArgs[1].draggable;
+            var o = eventArgs[1].helper || eventArgs[1].draggable;
+            return o ? o[0] : null;
         },
 
         getDragScope: function (el) {
@@ -208,7 +208,7 @@
          * @param originalEvent
          */
         trigger: function (el, event, originalEvent) {
-            el = this.getDOMElement(el);
+            el = this.getElement(el);
             var h = jQuery._data($(el)[0], "handle");
             h(originalEvent);
         }

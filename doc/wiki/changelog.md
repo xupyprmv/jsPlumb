@@ -1,22 +1,71 @@
+## 1.7.10
+
+### Changes between 1.7.9 and 1.7.10
+
+- Small update to getOffset to make it return the correct value if the input element was the container itself.
+- Small update to animation to fix incorrect falsey check.
+- Documented the `on` method of a `jsPlumbInstance` in the API docs.
+- `on` and `off` event registration methods now return the current jsPlumb instance
+    
+    
+## 1.7.9
+
+### Changes between 1.7.8 and 1.7.9
+
+- No more jQuery flavour. Vanilla jsPlumb is the only jsPlumb, and as such, has been renamed to simply `jsPlumb-1.7.9.js`.
+- First version of jsPlumb to be published to npm.
+- Addition of getManagedElements method. Returns a map of all the elements the instance of jsPlumb is currently managing.
+
+#### Issues
+
+- **421** svg gradient elements not cleaned up properly
+
+## 1.7.8
+
+### Changes between 1.7.7 and 1.7.8
+
+#### Issues
+
+- **381** -  instance.detach(connection) will detach source endpoint as well
+- **419** -  endpoints not cleaned up properly when connection converted to looback to endpoints not cleaned up properly when connection converted to loopback
+- **420** - Image endpoint not cleaned up correctly
+
+
+## 1.7.7
+
+### Changes between 1.7.6 and 1.7.7
+
+
+#### Issues
+
+- **408** - setIdChanged doesn't correctly handle element sources/targets
+- **410** - setConnector (whether applied via type or directly) removes custom css classes of other types
+- **412** - Endpoint style cannot be transparent 
+- **415** - Unnecessary endpoint may be created at when drag and drop endpoint from one node to another.
+
 ## 1.7.6
 
 ### Changes between 1.7.5 and 1.7.6
 
-A minor bugfix release, with a few new options for controlling connection detachment (and one small backward compatibility issue to be aware of)
+A minor bugfix release, with a few new options for controlling connection detachment (and one small backwards 
+compatibility issue to be aware of)
 
 #### Backwards Compatibility
 
 - All versions of jsPlumb prior to 1.7.6 would fire `beforeDetach` for both new Connection drags and also 
-dragging of existing Connections. As of 1.7.6 this latter behaviour has been moved to the `beforeStartDetach` interceptor.
+dragging of existing Connections. As of 1.7.6 this latter behaviour has been moved to the `beforeStartDetach` 
+interceptor.
 
 #### New Functionality
 
 -  `revalidate` now supports the same arguments as repaint - an ID, an Element, or a list-like
     object (such as the results of $(..) or document.querySelectorAll)
 
-- added `beforeStartDetach` interceptor: a function that is called before an existing connection is dragged off of one of its endpoints, and which can return false to cancel the drag.
+- added `beforeStartDetach` interceptor: a function that is called before an existing connection is dragged off of 
+one of its endpoints, and which can return false to cancel the drag.
 
-- The `unbind` method on various objects (jsPlumbInstance, Connection, Endpoint to name a few) now supports passing a Function to be unbound, rather than just some event name.
+- The `unbind` method on various objects (jsPlumbInstance, Connection, Endpoint to name a few) now supports passing a 
+Function to be unbound, rather than just some event name.
 
 - Connectors now have a `getLength` function, which returns their length in pixels. To access from a Connection,
       you need to first get the connector: `someConnection.getConnector().getLength()`
@@ -27,6 +76,10 @@ dragging of existing Connections. As of 1.7.6 this latter behaviour has been mov
 - **353** - multiple select disabled
 - **367** - rendering and drag/drop errors when parent element scrolled
 - **369** - unbinding events
+- **383** - jsPlumb.setDraggable fails for getElementsByClassName return value
+- **392** - onMaxConnections jpc isn't defined
+- **402** - offset update cache
+- **404** - statemachine demo makes ghost endpoints
 
 ## 1.7.5
 
@@ -383,7 +436,8 @@ Even if you have jQuery in the page you can use vanilla jsPlumb; it will accept 
 
 Release 1.5.0 contains several bugfixes and one or two minor enhancements, but the biggest change since 1.4.1 is the way jsPlumb handles inheritance internally - it has switched from a 'module pattern' architecture to a prototypal-based setup.  The module pattern is good for information hiding, but it makes objects bigger, and its far easier to leak memory with that sort of arrangement than it is with a prototypal inheritance scheme. 
 
-The build has been switched from the original Ant build to Grunt with release 1.5.0, and with this has come the ability to build versions of jsPlumb that omit functionality you do not need (see [[here|Build]]).
+The build has been switched from the original Ant build to Grunt with release 1.5.0, and with this has come the ability to 
+build versions of jsPlumb that omit functionality you do not need (see [here](Build)).
 
   1. [Backwards Compatibility](#backwards)
   - [New Functionality](#new)

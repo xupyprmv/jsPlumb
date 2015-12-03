@@ -42,13 +42,14 @@ var within = function (val, target, _ok, msg) {
 };
 
 var _divs = [];
-var _addDiv = function (id, parent) {
+var _addDiv = function (id, parent, className) {
     var d1 = document.createElement("div");
     d1.style.position = "absolute";
     if (parent) parent.appendChild(d1); else document.getElementById("container").appendChild(d1);
     d1.setAttribute("id", id);
     d1.style.left = (Math.floor(Math.random() * 1000)) + "px";
     d1.style.top = (Math.floor(Math.random() * 1000)) + "px";
+    if (className) d1.className = className;
     _divs.push(id);
     return d1;
 };
@@ -122,14 +123,14 @@ var testSuite = function (renderMode, _jsPlumb) {
     });
     */
 
-    test(" : getDOMElement", function () {
+    test(" : getElement", function () {
         var e = document.createElement("div");
         e.id = "FOO";
         document.body.appendChild(e);
-        var e2 = jsPlumb.getDOMElement(e);
+        var e2 = jsPlumb.getElement(e);
         equal(e2.id, "FOO");
 
-        var e3 = jsPlumb.getDOMElement("FOO");
+        var e3 = jsPlumb.getElement("FOO");
         equal(e3.id, "FOO");
     });
 
@@ -139,7 +140,7 @@ var testSuite = function (renderMode, _jsPlumb) {
 
     test(': getId', function () {
         var d10 = _addDiv('d10');
-        equal(_jsPlumb.getId(jsPlumb.getDOMElement(d10)), "d10");
+        equal(_jsPlumb.getId(jsPlumb.getElement(d10)), "d10");
     });
 
     test(': create a simple endpoint', function () {
@@ -197,7 +198,7 @@ var testSuite = function (renderMode, _jsPlumb) {
         var d = document.createElement("div");
         d.innerHTML = '<div id="container2"><ul id="targets"><li id="in1">input 1</li><li id="in2">input 2</li></ul><ul id="sources"><li id="output">output</li></ul></div>';
         var container = d.firstChild;
-        document.body.appendChild(jsPlumb.getDOMElement(container));
+        document.body.appendChild(jsPlumb.getElement(container));
         var e1 = _jsPlumb.addEndpoint("in1", { maxConnections: 1, isSource: false, isTarget: true, anchor: [ 0, 0.4, -1, 0 ] }),
             e2 = _jsPlumb.addEndpoint("in2", { maxConnections: 1, isSource: false, isTarget: true, anchor: [ 0, 0.4, -1, 0 ] }),
             e3 = _jsPlumb.addEndpoint("output", { isSource: true, isTarget: false, anchor: [ 1, 0.4, 1, 0 ] });
@@ -1492,6 +1493,25 @@ var testSuite = function (renderMode, _jsPlumb) {
         assertConnectionCount(e16, 0);
         assertConnectionCount(e17, 0);
         assertConnectionByScopeCount(_jsPlumb.getDefaultScope(), 0, _jsPlumb);
+    });
+
+    test("Image Endpoint remove", function() {
+        var d1 = _addDiv("d1"), d2 = _addDiv("d2");
+        _jsPlumb.makeSource(d1, {
+            endpoint:[ "Image", { src:"atom.png" }]
+        });
+
+        _jsPlumb.makeTarget(d2, {
+            endpoint:[ "Image", { src:"atom.png" }]
+        });
+
+        var c = _jsPlumb.connect({source:d1, target:d2});
+        var ep = c.endpoints[0];
+
+        ok(ep.canvas.parentNode != null, "endpoint 1 is in the DOM");
+
+        _jsPlumb.detach(c);
+        ok(ep.canvas.parentNode == null, "endpoint 1 is no longer in the DOM");
     });
 
     // Some race condition causes this to fail randomly.
@@ -3325,6 +3345,21 @@ var testSuite = function (renderMode, _jsPlumb) {
         ok(detachCallback != null, "detach callback was made");
     });
 
+    test(": _jsPlumb.connect (setting outline class on Connector)", function () {
+        var d1 = _addDiv("d1"), d2 = _addDiv("d2");
+        var c = _jsPlumb.connect({source: d1, target: d2, paintStyle:{outlineColor:"green", outlineWidth:6, lineWidth:4, strokeStyle:"red"}});
+        var has = function (clazz, elName) {
+            var cn = c.getConnector()[elName].className,
+                cns = cn.constructor == String ? cn : cn.baseVal;
+
+            return cns.indexOf(clazz) != -1;
+        };
+        ok(has(_jsPlumb.connectorClass, "canvas"), "basic connector class set correctly");
+
+        ok(has("_jsPlumb_connector_outline", "bgPath"), "outline canvas set correctly");
+        ok(has(_jsPlumb.connectorOutlineClass, "bgPath"), "outline canvas set correctly");
+    });
+
     test(": _jsPlumb.connect (setting cssClass on Connector)", function () {
         var d1 = _addDiv("d1"), d2 = _addDiv("d2");
         var c = _jsPlumb.connect({source: d1, target: d2, cssClass: "CSS"});
@@ -4011,6 +4046,24 @@ var testSuite = function (renderMode, _jsPlumb) {
         equal(bodyElementCount + 3, document.body.childNodes.length, "3 new elements added to the document body");
     });
 
+    test(" _jsPlumb.setContainer, moves managed nodes", function () {
+        var c2 = _addDiv("c2", document.body);
+        var c = document.getElementById("container");
+
+        equal(c.childNodes.length, 0, "container has no nodes");
+        var d1 = _addDiv("d1", c);
+        equal(c.childNodes.length, 1, "container has one node");
+        _jsPlumb.manage("d1", d1);
+
+        // d2 has d1 as the parent so it should not end up having the container as its parent.
+        var d2 = _addDiv("d2", d1);
+
+        _jsPlumb.setContainer("c2");
+        equal(d1.parentNode, c2, "managed node with no connections was moved");
+        equal(c.childNodes.length, 0, "container has no nodes");
+        equal(c2.childNodes.length, 1, "container 2 has one node");
+    });
+
 
     var _overlayTest = function(component, fn) {
         var o = component.getOverlays();
@@ -4152,20 +4205,23 @@ var testSuite = function (renderMode, _jsPlumb) {
             e = { isSource: true, isTarget: true, maxConnections: -1 },
             e1 = _jsPlumb.addEndpoint(d1, e),
             e2 = _jsPlumb.addEndpoint(d2, e),
-            c1 = _jsPlumb.connect({source: e1, target: e2});
+            c1 = _jsPlumb.connect({source: e1, target: e2, overlays:[ [ "Label", { id:"lbl"}]]});
 
+        equal(true, c1.getOverlay("lbl").isVisible(), "overlay is visible");
         equal(true, c1.isVisible(), "Connection 1 is visible after creation.");
         equal(true, e1.isVisible(), "endpoint 1 is visible after creation.");
         equal(true, e2.isVisible(), "endpoint 2 is visible after creation.");
 
         _jsPlumb.hide(d1);
 
+        equal(false, c1.getOverlay("lbl").isVisible(), "overlay is no longer visible");
         equal(false, c1.isVisible(), "Connection 1 is no longer visible.");
         equal(true, e1.isVisible(), "endpoint 1 is still visible.");
         equal(true, e2.isVisible(), "endpoint 2 is still visible.");
 
         _jsPlumb.show(d1);
 
+        equal(true, c1.getOverlay("lbl").isVisible(), "overlay is no visible again");
         equal(true, c1.isVisible(), "Connection 1 is visible again.");
     });
 
@@ -4372,26 +4428,15 @@ var testSuite = function (renderMode, _jsPlumb) {
                     borderStyle: "red",
                     fillStyle: "blue",
                     color: "green",
-                    font: "12px foo",
                     padding: 10
                 }
             }]
         ]});
-        // TODO jquery specific.
-        var o = c.getOverlay("label"), el = o.getElement();//el = $(o.getElement());
+        var o = c.getOverlay("label"), el = o.getElement();
         equal(el.style.borderWidth, "2px", "border width 2");
         equal(el.style.borderColor, "red", "border color red");
         equal(el.style.backgroundColor, "blue", "bg color blue");
         equal(el.style.color, "green", "color green");
-        var f = el.style.font;
-        ok(f == "12px foo" || f == "12px/normal foo"
-            , "bg font 12px foo");
-
-        // equal(el.css("border-width"), "2px", "border width 2");
-         //equal(el.css("border-color"), "rgb(255, 0, 0)", "border color red");
-         //equal(el.css("background-color"), "rgb(0, 0, 255)", "bg color blue");
-         //equal(el.css("color"), "rgb(0, 128, 0)", "color green");
-         //equal(el.css("font"), "normal normal normal 12px/normal foo", "bg font 12px foo");
 
     });
 
@@ -4531,33 +4576,25 @@ var testSuite = function (renderMode, _jsPlumb) {
         equal(ep.anchor.getDefaultFace(), "bottom", "default is bottom");
     });
 
-    test(" setImage on Endpoint", function () {
-        var d1 = _addDiv("d1"), d2 = _addDiv("d2"),
-            originalUrl = "../../demo/home/endpointTest1.png",
-            e = {
-                endpoint: [ "Image", { src: originalUrl } ]
-            },
-            ep = _jsPlumb.addEndpoint(d1, e);
-        expect(0);
-    });
     asyncTest(" setImage on Endpoint, with supplied onload", function () {
-        start();
-        var d1 = _addDiv("d1"), d2 = _addDiv("d2"),
+
+        var d1 = _addDiv("d1"), d2 = _addDiv("d2"), ep,
             e = {
                 endpoint: [ "Image", {
-                    src: "../../demo/home/endpointTest1.png",
+                    src: "atom.png",
                     onload: function (imgEp) {
-                        equal("../../demo/home/endpointTest1.png", imgEp.img.src);
-                        equal(ep.endpoint.canvas.getAttribute("src"), imgEp.img.src);
+                        QUnit.start();
+                        ok(imgEp._jsPlumb.img.src.indexOf("atom.png") != -1);
+                        ep.setImage("littledot.png", function (imgEp) {
+                            ok(imgEp._jsPlumb.img.src.indexOf("littledot.png") != -1);
+                        });
                     }
                 } ]
-            },
-            ep = _jsPlumb.addEndpoint(d1, e);
-        ep.setImage("../../demo/animation/littledot.png", function (imgEp) {
-            equal("../../demo/animation/littledot.png", imgEp.img.src);
-            equal(ep.endpoint.canvas.getAttribute("src"), imgEp.img.src);
-        });
-        expect(0);
+            };
+
+
+        ep = _jsPlumb.addEndpoint(d1, e);
+
     });
 
 
@@ -4711,6 +4748,9 @@ var testSuite = function (renderMode, _jsPlumb) {
         var c = _jsPlumb.connect({source: e1, target: e2}),
             c2 = _jsPlumb.connect({source: e2, target: e1});
 
+        ok(_jsPlumb.getManagedElements()["d1"] != null, "d1 exists in managed elements");
+        ok(_jsPlumb.getManagedElements()["d3"] == null, "d3 does not exist in managed elements");
+
         _jsPlumb.setId(jsPlumb.getSelector("#d1"), "d3");
         assertEndpointCount("d3", 2, _jsPlumb);
         assertEndpointCount("d1", 0, _jsPlumb);
@@ -4724,6 +4764,10 @@ var testSuite = function (renderMode, _jsPlumb) {
         equal(c.source.getAttribute("id"), "d3", "connection's source has changed");
         equal(c2.targetId, "d3", "connection's targetId has changed");
         equal(c2.target.getAttribute("id"), "d3", "connection's target has changed");
+
+        ok(_jsPlumb.getManagedElements()["d1"] == null, "d1 removed from managed elements");
+        ok(_jsPlumb.getManagedElements()["d3"] != null, "d3 exists in managed elements");
+
     });
 
     test(" setId, taking a DOM element and a string, only default scope", function () {
@@ -4892,6 +4936,37 @@ var testSuite = function (renderMode, _jsPlumb) {
         equal(c.source.getAttribute("id"), "d3", "connection's source has changed");
         equal(c2.targetId, "d3", "connection's targetId has changed");
         equal(c2.target.getAttribute("id"), "d3", "connection's target has changed");
+    });
+
+    test(" setId, taking two strings, testing makeSource/makeTarget", function () {
+        var d1 = _addDiv("d1");
+        var d2 = _addDiv("d2");
+
+        // setup d1 as a source
+        _jsPlumb.makeSource("d1", {
+            endpoint:"Rectangle",
+            parameters:{
+                foo:"foo"
+            }
+        });
+        // and d2 as a target
+        _jsPlumb.makeTarget("d2", {
+            endpoint:"Rectangle"
+        });
+
+        // connect them, and check that the endpoints are of tyoe Rectangle, per the makeSource/makeTarget
+        // directives
+        var c = _jsPlumb.connect({source: "d1", target: "d2"});
+        equal(c.endpoints[0].type, "Rectangle", "source endpoint is rectangle");
+        equal(c.endpoints[1].type, "Rectangle", "target endpoint is rectangle");
+
+        // now change the id of d1 and connect the new id, and check again that the source endpoint is Rectangle
+        _jsPlumb.setId(d1, "foo");
+        _jsPlumb.setId(d2, "bar");
+        var c2 = _jsPlumb.connect({source: "foo", target: "bar"});
+        equal(c2.endpoints[0].type, "Rectangle", "source endpoint is rectangle");
+        equal(c2.endpoints[1].type, "Rectangle", "target endpoint is rectangle");
+
     });
 
     test(" endpoint hide/show should hide/show overlays", function () {
@@ -5411,6 +5486,24 @@ var testSuite = function (renderMode, _jsPlumb) {
      //equal(null, c.getPaintStyle().foo, "foo is not set in c paint style");
      //equal(null, c2.getPaintStyle().foo, "foo is not set in c2 paint style");
      //});
+
+
+// ------------------------------- manage -----------------------------------------
+
+    test("Manage fires events", function() {
+        var d1 = _addDiv("d1"), f1 = false;
+        _jsPlumb.bind("manageElement", function() {
+            f1 = true;
+        });
+
+        _jsPlumb.manage("d1", d1);
+        ok(f1, "manageElement event fired");
+
+        delete _jsPlumb.getManagedElements()["d1"];
+        f1 = false;
+        _jsPlumb.manage("d1", d1, true);
+        ok(!f1, "manageElement event not fired for transient element");
+    });
 
 
 // ******************* getEndpoints ************************************************
@@ -6387,6 +6480,72 @@ var testSuite = function (renderMode, _jsPlumb) {
         expect(0);
     });
 
+
+// elements
+
+
+    test("svg gradients cleaned up correctly", function() {
+
+        var d1 = _addDiv("d1"), d2 = _addDiv("d2");
+        var c = _jsPlumb.connect({source:d1, target:d2, paintStyle:{
+            gradient: {stops: [
+                [0, "#678678"],
+                [0.5, "#09098e"],
+                [1, "#678678"]
+            ]},
+            lineWidth: 5,
+            strokeStyle: "#678678",
+            dashstyle: "2 2"
+        }});
+
+        var defs = c.canvas.querySelectorAll("defs");
+        equal(defs.length, 1, "1 defs element");
+
+        _jsPlumb.draggable(d1);
+
+        _dragANodeAround(d1);
+
+        defs = c.canvas.querySelectorAll("defs");
+        equal(defs.length, 1, "1 defs element");
+    });
+
+    test("node drag events", function() {
+
+        var d1 = _addDiv("d1"), d2 = _addDiv("d2");
+        var started = false, dragged = false, stopped = false;
+
+        _jsPlumb.draggable(d1, {
+            start:function() { started = true; },
+            drag:function() { dragged = true; },
+            stop:function() { stopped = true; }
+        });
+
+        _dragANodeAround(d1);
+
+        ok(started, "start event fired");
+        ok(dragged, "drag event fired");
+        ok(stopped, "stop event fired");
+
+        started = false; dragged = false; stopped = false;
+        var started2 = false, dragged2 = false, stopped2 = false;
+
+        _jsPlumb.draggable(d1, {
+            start:function() { started2 = true; },
+            drag:function() { dragged2 = true; },
+            stop:function() { stopped2 = true; },
+            force:true
+        });
+
+        _dragANodeAround(d1);
+
+        ok(started, "start event fired");
+        ok(dragged, "drag event fired");
+        ok(stopped, "stop event fired");
+        ok(started2, "2nd start event fired");
+        ok(dragged2, "2nd drag event fired");
+        ok(stopped2, "2nd stop event fired");
+    });
+
 // ------------- utility functions - math stuff, mostly --------------------------
 
     var tolerance = 0.00000005, withinTolerance = function (v1, v2, msg) {
@@ -6577,7 +6736,7 @@ var testSuite = function (renderMode, _jsPlumb) {
         jsPlumbUtil.replace(null, f6, 99);
         ok(true, "null argument ignored by util.replace");
 
-    })
+    });
 
 
     test(" arc segment tests", function () {
@@ -6850,7 +7009,7 @@ var testSuite = function (renderMode, _jsPlumb) {
     test(" jsPlumb.getSelector, with context node given as selector", function () {
         var d1 = _addDiv("d1");
         var d = makeContent("<div id='foo'></div>");
-        d1.appendChild(jsPlumb.getDOMElement(d));
+        d1.appendChild(jsPlumb.getElement(d));
         var s = _jsPlumb.getSelector(d1, "#foo");
         equal(s.length, 1, "foo found by getSelector with context d1");
         equal(s[0].getAttribute("id"), "foo", "foo found by getSelector with context d1");
@@ -6859,7 +7018,7 @@ var testSuite = function (renderMode, _jsPlumb) {
     test(" jsPlumb.getSelector, with context node given as DOM element", function () {
         var d1 = _addDiv("d1");
         var d = makeContent("<div id='foo'></div>");
-        d1.appendChild(jsPlumb.getDOMElement(d));
+        d1.appendChild(jsPlumb.getElement(d));
         var s = _jsPlumb.getSelector(d1, "#foo");
         equal(s.length, 1, "foo found by getSelector with context d1");
         equal(s[0].getAttribute("id"), "foo", "foo found by getSelector with context d1");
@@ -7190,15 +7349,48 @@ var testSuite = function (renderMode, _jsPlumb) {
         pageY: 50000
     };
 
+    var _randomEvent = function() {
+        var x = parseInt(Math.random() * 2000), y = parseInt(Math.random() * 2000);
+        return {
+            clientX:x,
+            clientY:y,
+            screenX:x,
+            screenY:y,
+            pageX:x,
+            pageY:y
+        };
+    };
+
+    var _dragANodeAround = function(el) {
+        _jsPlumb.trigger(el, "mousedown", _makeEvt(el));
+        var steps = Math.random() * 50;
+        for (var i = 0; i < steps; i++) {
+            var evt = _randomEvent();
+            el.style.left = evt.screenX + "px";
+            el.style.top= evt.screenY + "px";
+            _jsPlumb.trigger(document, "mousemove", evt);
+        }
+        _jsPlumb.trigger(document, "mouseup", _distantPointEvent);
+    };
+
+    //
+    // helper method to cause a connection to be dragged via the mouse, but programmatically.
+    //
     var _dragConnection = function (d1, d2) {
         var el1 = d1.canvas || d1, el2 = d2.canvas || d2;
         var e1 = _makeEvt(el1), e2 = _makeEvt(el2);
 
+        var conns = _jsPlumb.select().length;
+
         _jsPlumb.trigger(el1, "mousedown", e1);
         _jsPlumb.trigger(document, "mousemove", e2);
         _jsPlumb.trigger(el2, "mouseup", e2);
+
+        return _jsPlumb.select().get(conns);
     };
 
+    //
+    // helper method to cause a connection to be detached via the mouse, but programmatically.
     var _detachConnection = function (e, connIndex) {
         var el1 = e.canvas,
             c = e.connections[connIndex];
@@ -7210,18 +7402,22 @@ var testSuite = function (renderMode, _jsPlumb) {
         _jsPlumb.trigger(document, "mouseup", _distantPointEvent);
     };
 
-    /**
-     * Tests makeSource/makeTarget via event triggering.
-     * @method jsPlumb.Test.MakeSourceEventTriggering
-     *
-     test("connections via mouse between elements configured with makeSource/makeTarget", function() {
-        var d1 = _addDiv("d1"), d2 = _addDiv("d2");
-        _jsPlumb.makeSource(d1);
-        _jsPlumb.makeTarget(d2);
-         equal(_jsPlumb.select().length, 0, "zero connections before drag");
-        _dragConnection(d1, d2);
-        equal(_jsPlumb.select().length, 1, "one connection after drag");
-    });*/
+    var _relocateTarget = function(conn, target) {
+        _relocate(conn, 1, target);
+    };
+
+    var _relocate = function(conn, idx, newEl) {
+        var el1 = conn.endpoints[idx].canvas;
+        var e1 = _makeEvt(el1);
+        var e2 = _makeEvt(newEl);
+        _jsPlumb.trigger(el1, "mousedown", e1);
+        _jsPlumb.trigger(document, "mousemove", e2);
+        _jsPlumb.trigger(newEl, "mouseup", e2);
+    };
+
+    var _relocateSource = function(conn, source) {
+        _relocate(conn, 0, source);
+    };
 
      /**
      * Tests endpoint mouse interaction via event triggering: the ability to drag a connection to another
@@ -7260,6 +7456,118 @@ var testSuite = function (renderMode, _jsPlumb) {
 
          _detachConnection(e1, 0);
          equal(_jsPlumb.select().length, 0, "zero connections after detach");
+    });
+
+    test("connections via mouse between elements configured with makeSource/makeTarget", function() {
+        var d1 = _addDiv("d1"), d2 = _addDiv("d2"), d3 = _addDiv("d3"), d4 = _addDiv("d4");
+        _jsPlumb.makeSource("d1");
+        _jsPlumb.makeSource("d4");
+        _jsPlumb.makeTarget("d2");
+        _jsPlumb.makeTarget("d3");
+
+        equal(_jsPlumb.select().length, 0, "zero connections before drag");
+        _dragConnection(d1, d2);
+        equal(_jsPlumb.select().length, 1, "one connection after drag from source to target");
+        var cd1d2 = _jsPlumb.select().get(0);
+        equal(cd1d2.source.id, "d1", "source of first connection is correct");
+        equal(cd1d2.target.id, "d2", "target of first connection is correct");
+
+        _dragConnection(d1, d3);
+        equal(_jsPlumb.select().length, 2, "two connections after drag from source to target");
+        var cd1d3 = _jsPlumb.select().get(1);
+        equal(cd1d3.source.id, "d1", "source of second connection is correct");
+        equal(cd1d3.target.id, "d3", "target of second connection is correct");
+
+        // now we will drag the connection from d1-d2 by its target endpoint and put it on d3.
+        _relocateTarget(cd1d2, d3);
+        equal(cd1d2.target.id, "d3", "target of first connection has changed to d3");
+        equal(_jsPlumb.select().length, 2, "two connections after relocate");
+
+        _dragConnection(d3, d1);
+        equal(_jsPlumb.select().length, 2, "two connections after failed drag from target to source");
+
+        // now drag the source of d1-d2 to be d4.
+        _relocateSource(cd1d2, d4);
+        equal(cd1d2.source.id, "d4", "source of first connection has changed to d4");
+        equal(_jsPlumb.select().length, 2, "two connections after relocate");
+
+    });
+
+    test("issue 415: spurious endpoints after dragging", function() {
+        var d1 = _addDiv("d1"), d2 = _addDiv("d2"), d3 = _addDiv("d3"), d4 = _addDiv("d4");
+        _jsPlumb.makeSource([ "d1", "d2", "d3", "d4" ], {
+            maxConnections:-1
+        });
+        _jsPlumb.makeTarget([ "d1", "d2", "d3", "d4" ], {
+            maxConnections:-1
+        });
+
+        ok(_jsPlumb.isSource(d4), "d4 is a connection source");
+        ok(_jsPlumb.isTarget(d4), "d4 is a connection target");
+
+        var d1d2 = _dragConnection(d1, d2);
+        equal(_jsPlumb.select().length, 1, "one connection after drag");
+
+        var d2d3 = _dragConnection(d2, d3);
+        equal(_jsPlumb.select().length, 2, "two connections after drag");
+
+        equal(_jsPlumb.selectEndpoints().length, 4, "four endpoints before relocations");
+
+        _relocateTarget(d1d2, d4);
+        equal(d1d2.target.id, "d4", "target of first connection has changed to d4");
+
+        equal(_jsPlumb.select().length, 2, "two connections after relocations");
+        equal(_jsPlumb.selectEndpoints().length, 4, "four endpoints after relocations");
+
+        _relocateSource(d2d3, d4);
+
+        equal(d2d3.source.id, "d4", "source of second connection has changed to d4");
+        equal(_jsPlumb.select().length, 2, "two connections after relocations");
+        equal(_jsPlumb.selectEndpoints().length, 4, "four endpoints after relocations");
+
+    });
+
+    test("drag connection so it turns into a self-loop. ensure endpoints registered correctly. target not continuous anchor so not hidden (issue 419)", function() {
+        var d1 = _addDiv("d1"), d2 = _addDiv("d2"), d3 = _addDiv("d3"), d4 = _addDiv("d4");
+        _jsPlumb.makeSource([ "d1", "d2", "d3", "d4" ], { maxConnections: -1 });
+        _jsPlumb.makeTarget([ "d1", "d2", "d3", "d4" ], { maxConnections: -1 });
+
+        ok(_jsPlumb.isSource(d1), "d1 is a connection source");
+        ok(_jsPlumb.isTarget(d2), "d2 is a connection target");
+
+        // as a test: connect d3 to itself. 2 endpoints?
+        var d3d3 = _dragConnection(d3, d3);
+        equal(_jsPlumb.selectEndpoints().length, 2, "two endpoints");
+
+        var d2d1 = _dragConnection(d2, d1);
+        equal(_jsPlumb.select().length, 2, "one connection after drag");
+
+        _relocateSource(d2d1, d1);
+        equal(d2d1.endpoints[0].elementId, "d1", "source endpoint is on d1 now");
+        equal(_jsPlumb.selectEndpoints().length, 4, "four endpoints after relocations");
+
+        _relocateSource(d2d1, d2);
+        equal(d2d1.endpoints[0].elementId, "d2", "source endpoint is on d2 now");
+        ok(d2d1.endpoints[1].canvas.parentNode != null, "target canvas put back into DOM");
+    });
+
+    test("drag connection so it turns into a self-loop. ensure endpoints registered correctly. target is continuous anchor so is hidden. (issue 419)", function() {
+        var d1 = _addDiv("d1"), d2 = _addDiv("d2"), d3 = _addDiv("d3"), d4 = _addDiv("d4");
+        _jsPlumb.makeSource([ "d1", "d2", "d3", "d4" ], { maxConnections: -1, anchor:"Continuous" });
+        _jsPlumb.makeTarget([ "d1", "d2", "d3", "d4" ], { maxConnections: -1, anchor:"Continuous" });
+
+        var d2d1 = _dragConnection(d2, d1);
+        equal(_jsPlumb.select().length, 1, "one connection after drag");
+
+        _relocateSource(d2d1, d1);
+        equal(d2d1.endpoints[0].elementId, "d1", "source endpoint is on d1 now");
+        // NOTE in this test we are not using Continuous anchors so we do not expect the target to have been
+        // removed. the next test uses Continuous anchors and it checks the target has been removed.
+        //ok(d2d1.endpoints[1].canvas.parentNode == null, "target canvas removed from DOM");
+
+        _relocateSource(d2d1, d2);
+        equal(d2d1.endpoints[0].elementId, "d2", "source endpoint is on d2 now");
+        ok(d2d1.endpoints[1].canvas.parentNode != null, "target canvas put back into DOM");
     });
 
 
@@ -7401,6 +7709,96 @@ var testSuite = function (renderMode, _jsPlumb) {
         _jsPlumb.connect({source:d1, target:d2});
         equal(i, 0, "no listeners fired");
 
+    });
+
+    test("bind multiple listeners via array (multiple events, one function)", function() {
+        var count = 0;
+        _jsPlumb.bind(["foo", "bar", "baz"], function() {
+            count++;
+        });
+
+        _jsPlumb.fire("foo");
+        equal(count, 1, "count is 1");
+        _jsPlumb.fire("bar");
+        equal(count, 2, "count is 2");
+        _jsPlumb.fire("baz");
+        equal(count, 3, "count is 3");
+    });
+
+
+// -----------------issue 383, setDraggable doesnt work with list-like arguments
+
+    test("setDraggable with array", function() {
+        var d1 = _addDiv("d1", null, "aTest");
+        var d2 = _addDiv("d2", null, "aTest");
+
+        ok(!_jsPlumb.isAlreadyDraggable(d1), "d1 is not draggable");
+        ok(!_jsPlumb.isAlreadyDraggable(d2), "d2 is not draggable");
+        var d = document.getElementsByClassName("aTest");
+
+        // first make them draggable
+        if(typeof d === "function") {
+            expect(2);
+        }
+        else
+        {
+            _jsPlumb.draggable(d);
+            ok(_jsPlumb.isElementDraggable(d1), "d1 is now draggable");
+            ok(_jsPlumb.isElementDraggable(d2), "d2 is now draggable");
+
+            // now disable
+            _jsPlumb.setDraggable(d, false);
+            ok(!_jsPlumb.isElementDraggable(d1), "d1 is not draggable");
+            ok(!_jsPlumb.isElementDraggable(d2), "d2 is not draggable");
+
+            // and enable
+            _jsPlumb.toggleDraggable(d);
+            ok(_jsPlumb.isElementDraggable(d1), "d1 is draggable after toggle ");
+            ok(_jsPlumb.isElementDraggable(d2), "d2 is draggable after toggle");
+        }
+    });
+
+// ------------------ issue 402...offset cache not cleared always --------------------
+    test("offset cache cleared", function() {
+       var d1 = _addDiv("d1"), d2 = _addDiv("d2");
+        _jsPlumb.connect({source:d1, target:d2});
+        var cd = _jsPlumb.getCachedData("d1");
+       ok(cd.o != null, "d1 is cached");
+
+        // reset and then move d1. get cached data and offset should have been updated.
+        _jsPlumb.reset();
+        d1.style.position = "absolute";
+        d1.style.left = "5000px";
+        var cd2 = _jsPlumb.getCachedData("d1");
+        ok(cd2.o == null, "cache data cleared");
+        _jsPlumb.connect({source:d1, target:d2});
+        var cd3 = _jsPlumb.getCachedData("d1");
+        ok(cd3.o != null, "d1 is cached");
+
+        // delete every endpoint and then move d1. get cached data and offset should have been updated.
+        _jsPlumb.deleteEveryEndpoint();
+        d1.style.position = "absolute";
+        d1.style.left = "5000px";
+        var cd2 = _jsPlumb.getCachedData("d1");
+        ok(cd2.o == null, "cache data cleared");
+        _jsPlumb.connect({source:d1, target:d2});
+        var cd3 = _jsPlumb.getCachedData("d1");
+        ok(cd3.o != null, "d1 is cached");
+    });
+
+// ---------------------- issue 405, jsPlumb.empty doesnt remove connections (cannot reproduce) -----------------------
+
+    test("jsPlumb.empty removes connections", function() {
+        var p = _addDiv("p"),
+            d1 = _addDiv("d1", p),
+            d2 = _addDiv("d2", p);
+
+        _jsPlumb.connect({source:d1, target:d2});
+        ok(_jsPlumb.select().length == 1, "1 connection");
+
+        _jsPlumb.empty(p);
+        ok(document.getElementById("d1") == null);
+        ok(_jsPlumb.select().length == 0, "0 connections");
     })
 
 };

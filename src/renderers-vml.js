@@ -1,7 +1,7 @@
 /*
  * jsPlumb
  * 
- * Title:jsPlumb 1.7.6
+ * Title:jsPlumb 1.7.10
  * 
  * Provides a way to visually connect elements on an HTML page, using SVG or VML.  
  * 
@@ -20,6 +20,28 @@
 
     "use strict";
     var root = this, _jp = root.jsPlumb, _ju = root.jsPlumbUtil;
+
+    var _convertStyle = function (s, ignoreAlpha) {
+        if ("transparent" === s) return s;
+        var o = s,
+            pad = function (n) {
+                return n.length == 1 ? "0" + n : n;
+            },
+            hex = function (k) {
+                return pad(Number(k).toString(16));
+            },
+            dec = function(d) {
+                return hex(parseInt(d * 255, 10));
+            },
+            pattern = /(rgb[a]?\()(.*)(\))/;
+        if (s.match(pattern)) {
+            var parts = s.match(pattern)[2].split(",");
+            o = "#" + hex(parts[0]) + hex(parts[1]) + hex(parts[2]);
+            if (!ignoreAlpha && parts.length == 4)
+                o = o + dec(parts[3]);
+        }
+        return o;
+    };
 
     // http://ajaxian.com/archives/the-vml-changes-in-ie-8
     // http://www.nczonline.net/blog/2010/01/19/internet-explorer-8-document-and-browser-modes/
@@ -87,7 +109,7 @@
             // TODO is this failing? that would be because parent is not a plain DOM element.
             // IF SO, uncomment the line below this one and remove this one.
                 parent.appendChild(o);
-            //jsPlumb.getDOMElement(parent).appendChild(o);
+            //jsPlumb.getElement(parent).appendChild(o);
 
             o.className = (atts["class"] ? atts["class"] + " " : "") + "jsplumb_vml";
             _pos(o, d);
@@ -118,7 +140,7 @@
             var styleToWrite = {};
             if (style.strokeStyle) {
                 styleToWrite.stroked = "true";
-                var strokeColor = _ju.convertStyle(style.strokeStyle, true);
+                var strokeColor = _convertStyle(style.strokeStyle, true);
                 styleToWrite.strokecolor = strokeColor;
                 _maybeSetOpacity(styleToWrite, strokeColor, "stroke", component);
                 styleToWrite.strokeweight = style.lineWidth + "px";
@@ -127,7 +149,7 @@
 
             if (style.fillStyle) {
                 styleToWrite.filled = "true";
-                var fillColor = _ju.convertStyle(style.fillStyle, true);
+                var fillColor = _convertStyle(style.fillStyle, true);
                 styleToWrite.fillcolor = fillColor;
                 _maybeSetOpacity(styleToWrite, fillColor, "fill", component);
             }
